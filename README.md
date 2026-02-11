@@ -70,13 +70,7 @@ Os dados tratados podem ser usados para:
 
 ## 👨‍💻 Autor
 
-**Paulo Dias** 
-— Consultor Data Driven & MLOps  
-
-## 👨‍💻 Autor
-
-**Paulo Dias** 
-— Consultor Data Driven & MLOps  
+**Paulo Dias** — Consultor Data Driven & MLOps  
 
 - 🌐 Portfólio: <a href="https://paulopconsult-bit.github.io/" target="_blank">https://paulopconsult-bit.github.io/</a>  
 - 💼 LinkedIn: <a href="https://www.linkedin.com/in/paulo-data-driven/" target="_blank">https://www.linkedin.com/in/paulo-data-driven/</a>  
