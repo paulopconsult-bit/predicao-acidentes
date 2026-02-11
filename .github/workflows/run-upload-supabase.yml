@@ -1,0 +1,31 @@
+name: Run Upload CSV to Supabase
+
+on:
+  workflow_dispatch:      # permite rodar manualmente
+  schedule:
+    - cron: "0 3 * * *"   # roda todo dia às 03:00 UTC
+
+jobs:
+  run-r-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+
+      - name: Install R packages
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            httr
+            jsonlite
+            dplyr
+            readr
+            DBI
+            RPostgres
+
+      - name: Run script
+        run: Rscript scripts/01-Upload-Auto-CSV-Supabase.R
