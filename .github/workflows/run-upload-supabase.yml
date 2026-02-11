@@ -3,7 +3,7 @@ name: Run Upload CSV to Supabase
 on:
   workflow_dispatch:      # permite rodar manualmente
   schedule:
-    - cron: "*/5 * * * *" # Teste para rodar a cada 5 minutos | "0 3 * * *"   # roda todo dia às 03:00 UTC
+    - cron: "*/3 * * * *" # Teste para rodar a cada 5 minutos
 
 jobs:
   run-r-script:
