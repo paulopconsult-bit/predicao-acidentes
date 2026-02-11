@@ -8,7 +8,7 @@ name: Run Upload CSV to Supabase
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 */4 * * *"
+    - cron: "*/4 * * * *"
 
 jobs:
   run-r-script:
