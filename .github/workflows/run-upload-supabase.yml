@@ -7,7 +7,8 @@ name: Run Upload CSV to Supabase
 
 on:
   schedule:
-    - cron: "*/4 * * * *"
+    # Executa 1 vez por semana, toda segunda às 03:00 da manhã
+    - cron: "0 3 * * 1"
   workflow_dispatch:
   push:
     branches:
