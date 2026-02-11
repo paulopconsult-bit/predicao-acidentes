@@ -48,15 +48,6 @@ O pipeline executa automaticamente:
 
 ---
 
-## 🗄️ Acesso ao Banco (Supabase)
-
-A base tratada pode ser consultada diretamente no Supabase:
-
-- **URL do projeto:** https://kzybyjxqctmxphbdcibw.supabase.co  
-- **Tabela:** `acidentes_br116`  
-
----
-
 ## 🧠 Modelagem
 
 Os dados tratados podem ser usados para:
@@ -70,7 +61,8 @@ Os dados tratados podem ser usados para:
 
 ## 👨‍💻 Autor
 
-**Paulo Dias** — Consultor Data Driven & MLOps  
+**Paulo Dias** 
+— Consultor Data Driven
 
 - 🌐 Portfólio: <a href="https://paulopconsult-bit.github.io/" target="_blank">https://paulopconsult-bit.github.io/</a>  
 - 💼 LinkedIn: <a href="https://www.linkedin.com/in/paulo-data-driven/" target="_blank">https://www.linkedin.com/in/paulo-data-driven/</a>  
