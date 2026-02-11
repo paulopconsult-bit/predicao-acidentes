@@ -18,10 +18,10 @@ jobs:
 
       - name: Install R packages
         run: |
-          Rscript -e "install.packages('dotenv')"
-          Rscript -e "install.packages('httr')"
-          Rscript -e "install.packages('jsonlite')"
-          Rscript -e "install.packages('dplyr')"
+          Rscript -e "install.packages('dotenv', repos='https://cloud.r-project.org')"
+          Rscript -e "install.packages('httr', repos='https://cloud.r-project.org')"
+          Rscript -e "install.packages('jsonlite', repos='https://cloud.r-project.org')"
+          Rscript -e "install.packages('dplyr', repos='https://cloud.r-project.org')"
 
       - name: Debug secrets
         run: |
