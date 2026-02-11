@@ -1,0 +1,32 @@
+# Ignorar arquivos de ambiente
+private/
+
+# Ignorar dados brutos grandes
+data/raw/
+
+# Ignorar arquivos sensíveis
+*.key
+*.pem
+*.env
+
+# Ignorar arquivos temporários do R
+.Rhistory
+.RData
+.Ruserdata
+
+# Ignorar pasta do Rproj
+.Rproj.user/
+
+# Ignorar arquivos temporários do sistema
+.DS_Store
+Thumbs.db
+
+# Ignorar arquivos de cache
+*.tmp
+*.log
+
+# Ignorar arquivos exportados
+*.xlsx
+
+# Arquivos temporários do Excel
+~$*.xlsx
