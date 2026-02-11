@@ -1,3 +1,8 @@
+# ============================================
+# Workflow: Run Upload CSV to Supabase (R)
+# Corrigido com instalação de dependências do sistema
+# ============================================
+
 name: Run Upload CSV to Supabase
 
 on:
@@ -16,9 +21,11 @@ jobs:
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
 
+      # Instala dependências do sistema necessárias para o pacote curl
       - name: Install system dependencies
         run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
 
+      # Instala os pacotes R necessários
       - name: Install R packages
         run: |
           Rscript -e "install.packages('dotenv', repos='https://cloud.r-project.org')"
@@ -26,11 +33,13 @@ jobs:
           Rscript -e "install.packages('jsonlite', repos='https://cloud.r-project.org')"
           Rscript -e "install.packages('dplyr', repos='https://cloud.r-project.org')"
 
+      # Debug para verificar se os secrets estão chegando corretamente
       - name: Debug secrets
         run: |
           echo "URL: '$SUPABASE_URL'"
           echo "KEY length: ${#SUPABASE_KEY}"
 
+      # Executa o script R
       - name: Run script
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
