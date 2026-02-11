@@ -3,7 +3,7 @@ name: Run Upload CSV to Supabase
 on:
   workflow_dispatch:      # permite rodar manualmente
   schedule:
-    - cron: "*/3 * * * *" # Teste para rodar a cada 5 minutos
+    - cron: "*/3 * * * *" # Teste para rodar a cada 3 minutos
 
 jobs:
   run-r-script:
@@ -20,12 +20,10 @@ jobs:
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           packages: |
+            dotenv
             httr
             jsonlite
             dplyr
-            readr
-            DBI
-            RPostgres
 
       - name: Run script
         run: Rscript scripts/01-Upload-Auto-CSV-Supabase.R

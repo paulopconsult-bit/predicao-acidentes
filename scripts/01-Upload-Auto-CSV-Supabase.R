@@ -27,37 +27,41 @@
 # ============================================================
 #
 # ============================================================
-# SEÇÃO 2 — CONFIGURAÇÕES DO USUÁRIO
-# Ajuste estes parâmetros conforme o seu projeto.
+# SEÇÃO 2 — CONFIGURAÇÃO DE AMBIENTE (LOCAL vs ACTIONS)
 # ============================================================
 
-# Para acessar variável via arquivo ENV
-library(dotenv) 
-# Carrega o arquivo .env local 
-dotenv::load_dot_env("private/.env")
+rodando_no_actions <- Sys.getenv("GITHUB_ACTIONS") == "true"
 
-# Caminho do arquivo CSV local
-# Exemplo: "data/prepared/base_limpa_v1.csv"
-csv_path <- "G:/Meu Drive/predicao-acidentes/data/prepared/base_limpa_v1.csv"
+if (!rodando_no_actions) {
+  # -----------------------------
+  # AMBIENTE LOCAL
+  # -----------------------------
+  library(dotenv)
+  dotenv::load_dot_env("private/.env")
+  
+  supabase_url <- Sys.getenv("SUPABASE_URL")
+  supabase_key <- Sys.getenv("SUPABASE_KEY")
+  
+  # Caminho local do CSV
+  csv_path <- "G:/Meu Drive/predicao-acidentes/data/prepared/base_limpa_v1.csv"
+  
+} else {
+  # -----------------------------
+  # AMBIENTE GITHUB ACTIONS
+  # -----------------------------
+  supabase_url <- Sys.getenv("SUPABASE_URL")
+  supabase_key <- Sys.getenv("SUPABASE_KEY")
+  
+  # CSV dentro do repositório
+  csv_path <- "data/prepared/base_limpa_v1.csv"
+}
 
 # Nome da tabela no Supabase
-# Para o projeto "acidentes-BR-116", usamos:
 nome_tabela <- "acidentes_br116_base_limpa"
 
-# URL do projeto Supabase (sem /rest/v1), salva no .env
-# Você encontra em: Project Settings → API → Project URL
-supabase_url <- Sys.getenv("SUPABASE_URL")
-
-# Chave de API (anon key), salva no .env
-# Você encontra em: Project Settings → API Keys → anon key
-supabase_key <- Sys.getenv("SUPABASE_KEY")
-
-# Nome do schema no PostgreSQL (padrão é "public")
 schema_nome <- "public"
-
-# Tamanho do lote para inserção (evita enviar tudo de uma vez)
-# Envia, aguarda resposta do API do Supabase, se ok repete até completar o envio.
 tamanho_lote <- 1000
+
 
 # ============================================================
 # SEÇÃO 3 — FUNÇÕES AUXILIARES
@@ -177,4 +181,4 @@ while (inicio <= total_linhas) {
 }
 
 cat("🎉 Upload concluído com sucesso!\n")
-#
+# 11/02/2026
