@@ -181,4 +181,3 @@ while (inicio <= total_linhas) {
 }
 
 cat("🎉 Upload concluído com sucesso!\n")
-# 11/02/2026
