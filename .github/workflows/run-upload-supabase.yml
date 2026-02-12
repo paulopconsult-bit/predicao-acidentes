@@ -1,22 +1,32 @@
-# ============================================
-# Workflow: Run Upload CSV to Supabase (R)
-# Corrigido com instalação de dependências do sistema
-# ============================================
-
-name: Run Upload CSV to Supabase
+name: Pipeline Acidentes BR-116
 
 on:
   schedule:
-    # Executa 1 vez por semana, toda segunda às 03:00 da manhã
-    - cron: "0 3 * * 1"
-  workflow_dispatch:
+    - cron: "0 3 * * 1"   # Base limpa: segunda 03:00
+    - cron: "10 3 * * *"  # Base viva: diária 03:10
+  workflow_dispatch:       # Manual
   push:
     branches:
-      - main
+      - main               # Push só dispara base viva
+
+concurrency:
+  group: pipeline-acidentes
+  cancel-in-progress: false   # cria fila ordenada
 
 jobs:
-  run-r-script:
+
+  # ============================================================
+  # JOB 1 — Atualizar Base Limpa (semanal + manual)
+  # ============================================================
+  base_limpa:
     runs-on: ubuntu-latest
+
+    # Só roda se:
+    # - for manual
+    # - for schedule semanal
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'schedule' && startsWith(github.event.schedule, '0 3 * * 1'))
 
     steps:
       - name: Checkout repository
@@ -25,27 +35,52 @@ jobs:
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
 
-      # Instala dependências do sistema necessárias para o pacote curl
       - name: Install system dependencies
         run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
 
-      # Instala os pacotes R necessários
       - name: Install R packages
         run: |
-          Rscript -e "install.packages('dotenv', repos='https://cloud.r-project.org')"
-          Rscript -e "install.packages('httr', repos='https://cloud.r-project.org')"
-          Rscript -e "install.packages('jsonlite', repos='https://cloud.r-project.org')"
-          Rscript -e "install.packages('dplyr', repos='https://cloud.r-project.org')"
+          Rscript -e "install.packages(c('dotenv','httr','jsonlite','dplyr'), repos='https://cloud.r-project.org')"
 
-      # Debug para verificar se os secrets estão chegando corretamente
-      - name: Debug secrets
-        run: |
-          echo "URL: '$SUPABASE_URL'"
-          echo "KEY length: ${#SUPABASE_KEY}"
-
-      # Executa o script R
-      - name: Run script
+      - name: Run script base limpa
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: Rscript scripts/01-Upload-Auto-CSV-Supabase.R
+
+
+  # ============================================================
+  # JOB 2 — Atualizar Base Viva (diário + manual + push)
+  # ============================================================
+  base_viva:
+    runs-on: ubuntu-latest
+    needs: base_limpa   # só é usado quando ambos forem disparados juntos
+
+    # Só roda se:
+    # - for manual
+    # - for push
+    # - for schedule diário
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'push' ||
+      (github.event_name == 'schedule' && startsWith(github.event.schedule, '10 3 * * *'))
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
+
+      - name: Install R packages
+        run: |
+          Rscript -e "install.packages(c('dotenv','httr','jsonlite','dplyr','lubridate'), repos='https://cloud.r-project.org')"
+
+      - name: Run script base viva
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: Rscript scripts/02-Upload-Auto-Supabase-Base-Viva.R
