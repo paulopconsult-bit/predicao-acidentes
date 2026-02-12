@@ -4,10 +4,10 @@ on:
   schedule:
     - cron: "0 3 * * 1"   # Base limpa: segunda 03:00
     - cron: "10 3 * * *"  # Base viva: diária 03:10
-  workflow_dispatch:       # Manual
+  workflow_dispatch:
   push:
     branches:
-      - main               # Push só dispara base viva
+      - main
 
 concurrency:
   group: pipeline-acidentes
