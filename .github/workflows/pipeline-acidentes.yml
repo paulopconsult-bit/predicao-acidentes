@@ -103,7 +103,8 @@ jobs:
 
       - name: Install R packages
         run: |
-          Rscript -e "install.packages(c('dotenv','httr','jsonlite','dplyr','lubridate','pROC','InformationValue'), repos='https://cloud.r-project.org')"
+          Rscript -e "install.packages(c('dotenv','httr','jsonlite','dplyr','lubridate','pROC'), repos='https://cloud.r-project.org')"
+          Rscript -e "install.packages('InformationValue', repos='https://cloud.r-project.org', dependencies=TRUE)"
 
       - name: Run script monitoramento
         env:
