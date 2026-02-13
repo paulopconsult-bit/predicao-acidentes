@@ -51,9 +51,7 @@ jobs:
   # ============================================================
   base_viva:
     runs-on: ubuntu-latest
-
-    # Só depende da base_limpa quando for manual
-    needs: ${{ github.event_name == 'workflow_dispatch' && 'base_limpa' || '' }}
+    needs: base_limpa   # sempre depende, mas só roda se base_limpa rodar
 
     if: |
       github.event_name == 'workflow_dispatch' ||
