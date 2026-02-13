@@ -57,7 +57,7 @@ jobs:
     if: |
       github.event_name == 'workflow_dispatch' ||
       github.event_name == 'push' ||
-      (github.event_name == 'schedule' && startsWith(github.event.schedule, '10 3 * * *'))
+      (github.event_name == 'schedule' && startsWith(github.event.schedule, '40 3 * * *'))
 
     steps:
       - name: Checkout repository
@@ -89,7 +89,7 @@ jobs:
 
     if: |
       github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'schedule' && startsWith(github.event.schedule, '10 5 * *'))
+      (github.event_name == 'schedule' && startsWith(github.event.schedule, '20 5 * * 1,5'))
 
     steps:
       - name: Checkout repository
