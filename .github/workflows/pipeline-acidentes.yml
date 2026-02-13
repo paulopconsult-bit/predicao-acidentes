@@ -2,8 +2,8 @@ name: Pipeline Acidentes BR-116
 
 on:
   schedule:
-    - cron: "0 3 * * 1"        # Base limpa — segunda 03:00
-    - cron: "40 3 * * *"       # Base viva — diário 03:40
+    - cron: "0 3 * * 1"                   # Base limpa — segunda 03:00
+    - cron: "40 3 * * *"                                  # Base viva — diário 03:40
     - cron: "20 5 * * 1,5"     # Monitoramento — segunda e sexta 05:20
   workflow_dispatch:           # Execução manual
   push:
