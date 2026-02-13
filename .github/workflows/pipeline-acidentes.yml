@@ -2,8 +2,8 @@ name: Pipeline Acidentes BR-116
 
 on:
   schedule:
-    - cron: "0 3 * * 1"   # Base limpa: segunda 03:00
-    - cron: "10 3 * * *"  # Base viva: diária 03:10
+    - cron: "0 3 * * 1"
+    - cron: "10 3 * * *"
   workflow_dispatch:
   push:
     branches:
