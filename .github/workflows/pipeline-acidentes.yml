@@ -34,7 +34,9 @@ jobs:
         uses: r-lib/actions/setup-r@v2
 
       - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev
 
       - name: Install R packages
         run: |
@@ -67,7 +69,9 @@ jobs:
         uses: r-lib/actions/setup-r@v2
 
       - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev
 
       - name: Install R packages
         run: |
@@ -81,7 +85,7 @@ jobs:
 
 
   # ============================================================
-  # MONITORAMENTO — segunda e sexta às 05:10
+  # MONITORAMENTO — segunda e sexta às 05:20
   # ============================================================
   monitoramento:
     runs-on: ubuntu-latest
@@ -98,8 +102,21 @@ jobs:
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
 
+      # Pacotes de sistema necessários para compilar InformationValue e dependências
       - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libcurl4-openssl-dev \
+            libssl-dev \
+            libxml2-dev \
+            libfontconfig1-dev \
+            libharfbuzz-dev \
+            libfribidi-dev \
+            libfreetype6-dev \
+            libpng-dev \
+            libtiff5-dev \
+            libjpeg-dev
 
       - name: Install R packages
         run: |
