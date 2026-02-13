@@ -121,7 +121,8 @@ jobs:
       - name: Install R packages
         run: |
           Rscript -e "install.packages(c('dotenv','httr','jsonlite','dplyr','lubridate','pROC'), repos='https://cloud.r-project.org')"
-          Rscript -e "install.packages('InformationValue', repos='https://cloud.r-project.org', dependencies=TRUE)"
+          Rscript -e "install.packages(c('Hmisc','gplots','ROCR','caTools','bitops'), repos='https://cloud.r-project.org')"
+          Rscript -e "install.packages('InformationValue', repos='https://cloud.r-project.org')"
 
       - name: Run script monitoramento
         env:
