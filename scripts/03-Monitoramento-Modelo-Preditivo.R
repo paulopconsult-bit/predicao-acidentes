@@ -1,7 +1,7 @@
 ###############################################################
 # SCRIPT DIÁRIO — Monitoramento do Modelo de Severidade
-# Objetivo: ajustar o modelo na base viva acumulada,
-# calcular métricas brutas e registrar no Supabase.
+# Objetivo: aplicar o modelo de produção na base viva acumulada,
+# calcular métricas reais e registrar no Supabase.
 ###############################################################
 
 library(httr)
@@ -9,7 +9,6 @@ library(jsonlite)
 library(dplyr)
 library(lubridate)
 library(pROC)
-library(InformationValue)
 
 ###############################################################
 # 1. Configuração de ambiente (local vs GitHub Actions)
@@ -63,7 +62,7 @@ inserir_registro <- function(df, nome_tabela) {
 }
 
 ###############################################################
-# 3. Ler baseline (apenas métricas de referência)
+# 3. Ler baseline (cutoff e métricas de referência)
 ###############################################################
 
 cat("📌 Lendo acidentes_br116_modelo_baseline...\n")
@@ -72,72 +71,53 @@ baseline <- ler_tabela("acidentes_br116_modelo_baseline") %>%
   arrange(desc(data_treinamento)) %>%
   slice(1)
 
-auc_base_treino <- baseline$auc_treino
-auc_base_teste  <- baseline$auc_teste
-ks_base_treino  <- baseline$ks_treino
-ks_base_teste   <- baseline$ks_teste
-cutoff_base     <- baseline$cutoff
+cutoff_base <- baseline$cutoff
 
 ###############################################################
 # 4. Ler base viva acumulada
 ###############################################################
 
 base_viva <- ler_tabela("acidentes_br116_base_viva")
-
 n_linhas_base_viva <- nrow(base_viva)
 
 ###############################################################
-# 4.1 — Ajustar tipos (ESSENCIAL)
+# 5. Carregar o modelo de produção (.rds)
 ###############################################################
 
-# Transformar Periodo em factor com os mesmos níveis do treino
-base_viva$Periodo <- factor(
-  base_viva$Periodo,
-  levels = c("manha", "noturno", "vespertino")  # MESMOS níveis do treino
-)
-
-# Transformar Km_cat em factor com os mesmos níveis do treino
-base_viva$Km_cat <- factor(
-  base_viva$Km_cat,
-  levels = c("(0,25]", "(25,50]", "(50,75]", "(75,100]", "(100,125]",
-             "(125,150]", "(150,175]", "(175,200]", "(200,225]",
-             "(225,250]", "(250,300]", "(300,400]", "(400,500]", "(500,600]")
-)
+modelo_original <- readRDS("modelos/modelo_producao.rds")
 
 ###############################################################
-# 5. Ajustar modelo na base viva (mesma fórmula da produção)
+# 6. Ajustar níveis categóricos conforme o modelo original
 ###############################################################
 
-modelo_viva <- glm(
-  Gravemente_feridos_Mortos ~ Automovel + Bicicleta + Caminhao +
-    Moto + Onibus + Outros + Utilitario +
-    Periodo + Km_cat,
-  family = binomial(link = "logit"),
-  data = base_viva
-)
+niveis_treino <- modelo_original$xlevels
+
+for (var in names(niveis_treino)) {
+  base_viva[[var]] <- factor(
+    base_viva[[var]],
+    levels = niveis_treino[[var]]
+  )
+}
+
+# Remover linhas incompatíveis
+base_viva <- base_viva %>%
+  filter(if_all(all_of(names(niveis_treino)), ~ !is.na(.x)))
 
 ###############################################################
-# 6. Probabilidade
+# 7. Gerar probabilidade usando o modelo original
 ###############################################################
 
-base_viva$probabilidade <- predict(modelo_viva, base_viva, type = "response")
+base_viva$probabilidade <- predict(modelo_original, base_viva, type = "response")
 
 ###############################################################
-# 7. Métricas (MESMO CRITÉRIO DO BASELINE)
+# 8. Calcular AUC e Sensibilidade
 ###############################################################
 
-# KS
-ks_viva <- ks_stat(
-  actuals = base_viva$Gravemente_feridos_Mortos,
-  predictedScores = base_viva$probabilidade
-)
-
-# AUC
 roc_obj <- pROC::roc(base_viva$Gravemente_feridos_Mortos,
                      base_viva$probabilidade)
+
 auc_viva <- as.numeric(pROC::auc(roc_obj))
 
-# Sensibilidade com cutoff do baseline
 base_viva$Predito <- ifelse(base_viva$probabilidade > cutoff_base, 1, 0)
 
 TP <- sum(base_viva$Predito == 1 & base_viva$Gravemente_feridos_Mortos == 1)
@@ -145,15 +125,65 @@ FN <- sum(base_viva$Predito == 0 & base_viva$Gravemente_feridos_Mortos == 1)
 
 sensibilidade_viva <- TP / (TP + FN)
 
+###############################################################
+# 8A. Validação automática do KS — evita KS = 1 artificial
+###############################################################
+
+ks_valido <- TRUE
+motivo_invalidacao <- NULL
+
+# 1) Base muito pequena
+if (nrow(base_viva) < 200) {
+  ks_valido <- FALSE
+  motivo_invalidacao <- "Base viva pequena"
+}
+
+# 2) Classe positiva ausente
+if (sum(base_viva$Gravemente_feridos_Mortos == 1) == 0) {
+  ks_valido <- FALSE
+  motivo_invalidacao <- "Sem positivos na base viva"
+}
+
+# 3) Classe negativa ausente
+if (sum(base_viva$Gravemente_feridos_Mortos == 0) == 0) {
+  ks_valido <- FALSE
+  motivo_invalidacao <- "Sem negativos na base viva"
+}
+
+# 4) Probabilidades colapsadas
+q <- quantile(base_viva$probabilidade, probs = c(0, 0.25, 0.5, 0.75, 1))
+if (length(unique(q)) <= 2) {
+  ks_valido <- FALSE
+  motivo_invalidacao <- "Probabilidades colapsadas"
+}
+
+# 5) Separação perfeita
+if (ks_valido) {
+  pos <- base_viva$probabilidade[base_viva$Gravemente_feridos_Mortos == 1]
+  neg <- base_viva$probabilidade[base_viva$Gravemente_feridos_Mortos == 0]
+  
+  if (length(pos) > 0 && length(neg) > 0 && min(pos) > max(neg)) {
+    ks_valido <- FALSE
+    motivo_invalidacao <- "Separação perfeita detectada"
+  }
+}
+
+# 6) Aplicar validação
+if (!ks_valido) {
+  cat("\n⚠️ KS INVALIDADO:", motivo_invalidacao, "\n")
+  ks_viva <- NA
+} else {
+  ks_viva <- max(abs(roc_obj$sensitivities - roc_obj$specificities))
+}
 
 ###############################################################
-# 8. Capturar o último carga_id da base viva
+# 9. Capturar o último carga_id da base viva
 ###############################################################
 
 carga_atual <- max(base_viva$carga_id)
 
 ###############################################################
-# 9. Inserir métricas brutas no Supabase
+# 10. Inserir métricas brutas no Supabase
 ###############################################################
 
 registro <- list(
@@ -163,21 +193,17 @@ registro <- list(
   auc_viva = ifelse(is.na(auc_viva), 0, auc_viva),
   ks_viva = ifelse(is.na(ks_viva), 0, ks_viva),
   sensibilidade_viva = ifelse(is.na(sensibilidade_viva), 0, sensibilidade_viva),
-  cutoff_usado = ifelse(is.na(cutoff_base), 0, cutoff_base)
+  cutoff_usado = cutoff_base
 )
 
 print(registro)
 
 resp <- inserir_registro(registro, "acidentes_br116_modelo_monitoramento")
-# STATUS CODE: 201
 
 cat("\nSTATUS CODE: ", resp$status_code, "\n")
 cat("RESPOSTA DO SUPABASE:\n")
 print(content(resp, "text", encoding = "UTF-8"))
 
-
 ###############################################################
 # FIM DO SCRIPT
 ###############################################################
-
-

@@ -868,7 +868,7 @@ vif(modelo)
 
 
 ###############################################################
-# SESSÃO 14 — Ajustamento do Modelo / Se necessário
+# SEÇÃO 14 — Ajustamento do Modelo / Se necessário
 ###############################################################
 
 
@@ -886,7 +886,6 @@ vif(modelo)
 # AIC: 9145.3, manteve o mesmo valor - Utilitario_bin realmente não contribuía com nada
 # O modelo ficou mais simples
 # Não perdeu qualidade (AIC igual)
-
 
 ###############################################################
 # SESSÃO 15 — KS (Kolmogorov-Smirnov), AUC e ROC
@@ -1069,7 +1068,7 @@ Precisao
 # 0.07751164
 
 ###############################################################
-# SESSÃO 17 — Estrair os coeficientes do MODELO DE REGRESSÃO
+# SEÇÃO 17 — Estrair os coeficientes do MODELO DE REGRESSÃO
 ###############################################################
 # logit(𝑝)=  𝛽0+𝛽1𝑋1+𝛽2𝑋2+…
 
@@ -1082,6 +1081,22 @@ formula(modelo)
 # obter a equação completa em formato matemático
 library(equatiomatic)
 extract_eq(modelo, use_coefs = TRUE)
+
+
+###############################################################
+# SEÇÃO 17.1 SALVAR O MODELO DE PRODUÇÃO
+# Objetivo: salvar o objeto 'modelo' já treinado e testado
+###############################################################
+
+# 1. Criar a pasta /modelos caso ainda não exista
+if (!dir.exists("modelos")) {
+  dir.create("modelos")
+}
+
+# 2. Salvar o modelo oficial de produção
+saveRDS(modelo, "modelos/modelo_producao.rds")
+
+cat("\n✅ Modelo salvo com sucesso em: modelos/modelo_producao.rds\n")
 
 ###############################################################
 # SESSÃO 18 — Árvore de Decisão CHAID
