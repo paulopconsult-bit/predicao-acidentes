@@ -32,4 +32,4 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: |
-          Rscript 03-Monitoramento-Modelo-Preditivo.R
+          Rscript scripts/03-Monitoramento-Modelo-Preditivo.R
