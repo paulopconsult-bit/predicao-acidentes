@@ -3,7 +3,10 @@ name: Monitoramento do Modelo
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 9 * * *"
+    # Segunda-feira às 10:00 UTC
+    - cron: "0 10 * * 1"
+    # Quinta-feira às 09:00 UTC
+    - cron: "0 10 * * 4"
 
 jobs:
   monitoramento:
