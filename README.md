@@ -1,22 +1,17 @@
-# 🚧 Predição de Acidentes na BR‑116 — Pipeline Automatizado com R + Supabase + GitHub Actions
+# 🛣️ Predição de Acidentes na BR‑116
 
-Este repositório contém o pipeline completo para preparação, limpeza e envio automático da base de acidentes da BR‑116 para o Supabase.  
-O objetivo é permitir que qualquer pessoa possa:
-
-- baixar os dados brutos
-- treinar modelos
-- acompanhar atualizações automáticas
-- consultar a base limpa diretamente no Supabase
+Este projeto utiliza um modelo de **regressão logística** para estimar a probabilidade de ocorrência de acidentes graves na rodovia BR‑116, com base em variáveis como tipo de veículo, período do dia e localização (faixa de quilometragem).
 
 ---
 
-## 📦 Estrutura do Projeto
+## 📐 Fórmula do Modelo Logístico
 
-- `raw/` — arquivos originais da ANTT (CSV/TXT/PDF)
-- `scripts/` — scripts SQL para higienização da base e R para limpeza, transformação
-- `outputs/` — dados tratados e prontos para modelagem
-- `.github/workflows/` — automações do GitHub Actions
-- `README.md` — documentação do projeto
+A função logística transforma uma combinação linear de variáveis explicativas em uma probabilidade entre 0 e 1:
+
+
+\[
+p = \frac{1}{1 + e^{-(\beta_0 + \beta_1 \cdot Automóvel + \beta_2 \cdot Bicicleta + \beta_3 \cdot Caminhão + \beta_4 \cdot Moto + \ldots)}}
+\]
 
 ---
 
@@ -36,26 +31,59 @@ Esses arquivos são usados como entrada no pipeline automatizado.
 
 ---
 
-## 🔄 Pipeline Automatizado
 
-O pipeline executa automaticamente:
+## 🗂️ Coeficientes do Modelo
 
-1. Download dos arquivos brutos  
-2. Leitura e limpeza dos dados  
-3. Padronização das colunas  
-4. Upload para o Supabase  
-5. Execução automática a cada 4 horas via GitHub Actions  
+| Coeficiente | Variável               | Valor     |
+|-------------|------------------------|-----------|
+| β₀          | Intercepto             | -2.4073   |
+| β₁          | Automóvel              | -0.5701   |
+| β₂          | Bicicleta              | 2.0264    |
+| β₃          | Caminhão               | 0.0389    |
+| β₄          | Moto                   | 0.4407    |
+| β₅          | Ônibus                 | 0.0731    |
+| β₆          | Outros                 | 0.3423    |
+| β₇          | Utilitário             | -0.0702   |
+| β₈          | Período manhã          | -1.2201   |
+| β₉          | Período noturno        | -0.5018   |
+| β₁₀         | Período vespertino     | -1.2032   |
+| β₁₁         | Km 25–50               | 0.1423    |
+| β₁₂         | Km 50–75               | 0.3256    |
+| β₁₃         | Km 75–100              | 0.2390    |
+| β₁₄         | Km 100–125             | 0.0074    |
+| β₁₅         | Km 125–150             | -0.2197   |
+| β₁₆         | Km 150–175             | -0.0685   |
+| β₁₇         | Km 175–200             | 0.1911    |
+| β₁₈         | Km 200–225             | 0.0102    |
+| β₁₉         | Km 225–250             | 0.0723    |
 
 ---
 
-## 🧠 Modelagem
+## 🖼️ Visualização do Modelo
 
-Os dados tratados podem ser usados para:
+![Modelo Logístico – Fórmula e Coeficientes](media/ModeloLogístico.png)
 
-- modelos de classificação (gravidade)
-- modelos de regressão (probabilidade de acidente)
-- análises espaciais
-- dashboards e monitoramento
+---
+
+## 📊 Interpretação dos Coeficientes
+
+- **Coeficientes positivos** indicam aumento na probabilidade de acidente grave.  
+  Exemplo: Bicicleta (β₂ = 2.0264) → maior risco associado.
+
+- **Coeficientes negativos** indicam redução na probabilidade.  
+  Exemplo: Período manhã (β₈ = -1.2201) → menor risco relativo.
+
+- **Faixas de Km_cat** ajudam a identificar trechos mais críticos da rodovia.  
+  Exemplo: Km 50–75 (β₁₂ = 0.3256) → trecho com maior risco estimado.
+
+---
+
+## 🧠 Aplicações
+
+- Monitoramento de trechos críticos  
+- Planejamento de ações preventivas  
+- Apoio à tomada de decisão em segurança viária  
+- Visualização em dashboards (Looker Studio, Supabase)
 
 ---
 
