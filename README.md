@@ -4,17 +4,6 @@ Este projeto utiliza um modelo de **regressão logística** para estimar a proba
 
 ---
 
-## 📐 Fórmula do Modelo Logístico
-
-A função logística transforma uma combinação linear de variáveis explicativas em uma probabilidade entre 0 e 1:
-
-
-\[
-p = \frac{1}{1 + e^{-(\beta_0 + \beta_1 \cdot Automóvel + \beta_2 \cdot Bicicleta + \beta_3 \cdot Caminhão + \beta_4 \cdot Moto + \ldots)}}
-\]
-
----
-
 ## 📥 Downloads dos Dados Brutos (ANTT)
 
 Abaixo estão os links para visualização e download dos arquivos originais disponibilizados pela ANTT.  
@@ -60,6 +49,8 @@ Esses arquivos são usados como entrada no pipeline automatizado.
 ---
 
 ## 🖼️ Visualização do Modelo
+
+A função logística transforma uma combinação linear de variáveis explicativas em uma probabilidade entre 0 e 1:
 
 ![Modelo Logístico – Fórmula e Coeficientes](media/ModeloLogístico.png)
 
