@@ -78,6 +78,25 @@ A função logística transforma uma combinação linear de variáveis explicati
 
 ---
 
+## 📊 Monitoramento do Modelo (Looker Studio)
+
+O desempenho do modelo é acompanhado continuamente por meio de um dashboard no Looker Studio, com foco nas métricas essenciais para avaliar a capacidade discriminativa e a sensibilidade do classificador.
+
+### 🔹 Métricas Monitoradas
+
+- **KS (Kolmogorov–Smirnov)** — Mede a separação entre as distribuições de positivos e negativos, indicando o poder discriminativo do modelo.
+- **AUC (Área sob a Curva ROC)** — Avalia a capacidade global do modelo em distinguir classes ao longo de diferentes limiares.
+- **Sensibilidade (Recall)** — Mede a proporção de acidentes graves corretamente identificados, reduzindo falsos negativos.
+
+### 🔍 Prévia do Dashboard
+
+![Preview do Dashboard](media/LookerStudio.png)
+
+🔗 **Dashboard no Looker Studio:**  
+https://lookerstudio.google.com/reporting/96df9152-3799-4f99-9dcc-ad59c6798b6c
+
+---
+
 ## 👨‍💻 Autor
 
 **Paulo Dias** 
